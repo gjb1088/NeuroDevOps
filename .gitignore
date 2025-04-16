@@ -172,3 +172,40 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ansible
+*.retry
+*.log
+*.vault
+inventory.ini
+*.cfg
+*.bak
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# VS Code
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Logs and Databases
+logs/
+*.log
+*.sqlite3
+*.db
+
+# System folders and temp files
+.idea/
+*.swp
+
+# Node (for future UI or dashboards)
+node_modules/
+npm-debug.log
+yarn-error.log
