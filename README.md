@@ -84,4 +84,4 @@ docker-compose up -d
 **George Burnite**  
 *Cyberpunk Sysadmin. Infrastructure Alchemist. Creator of Burn.IT.*
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-GeorgeBurnite-blue)](https://www.linkedin.com/in/georgeburnite/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-GeorgeBurnite-blue)](https://www.linkedin.com/in/george-burnite-9a0799163/)
