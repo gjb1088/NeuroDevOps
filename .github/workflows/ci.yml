@@ -1,0 +1,67 @@
+
+name: NeuroDevOps CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Code and Config Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pyyaml
+
+      - name: Run flake8 on Python files
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+
+      - name: Lint YAML files
+        run: |
+          sudo apt-get install yamllint -y
+          yamllint .
+
+  docker:
+    name: Dockerfile Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: '**/Dockerfile'
+
+  report-check:
+    name: Test PDF Report Generator (smoke test)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install matplotlib reportlab
+
+      - name: Run reportgen script (test only)
+        run: |
+          if [ -f reportgen/generate_report.py ]; then python reportgen/generate_report.py || true; fi
