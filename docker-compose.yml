@@ -5,6 +5,16 @@ services:
     build:
       context: ./ai_engine
     container_name: neurodevops-ai
+    restart: unless-stopped
+    expose:
+      - 11434
+   collector:
+     build:
+      context: ./collector
+    depends_on:
+      - ai_engine
+    restart: unless-stopped
+  
     depends_on:
       - ollama_host
     environment:
