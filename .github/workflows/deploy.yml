@@ -1,0 +1,22 @@
+name: Deploy NeuroDevOps AI Engine
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Build & Restart Containers
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v3
+
+      - name: Pull and rebuild containers
+        run: |
+          docker compose down
+          docker compose up --build -d
+
+      - name: Confirm deployment status
+        run: docker ps
