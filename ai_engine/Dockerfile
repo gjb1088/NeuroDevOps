@@ -2,8 +2,5 @@
 
 FROM ollama/ollama:latest
 
-# Preload the Mistral model at build time
-RUN ollama pull mistral
-
-# Run the Ollama API server
+# Start the Ollama model server
 CMD ["ollama", "serve"]
