@@ -28,21 +28,18 @@ def send_to_ai(prompt):
         print("[Ollama Error]", e)
         return "[AI response unavailable]"
 
-def send_to_dashboard(metrics, ai_response):
+def send_to_ai(prompt):
+    payload = {
+        "model": "mistral",
+        "prompt": prompt,
+        "stream": False
+    }
     try:
-        response = requests.post(DASHBOARD_API, json={
-            "metrics": metrics,
-            "ai": ai_response
-        })
-        if response.status_code != 200:
-            print("[Dashboard Error] Status:", response.status_code, response.text)
+        response = requests.post(OLLAMA_API, json=payload)
+        response.raise_for_status()
+        result = response.json()
+        print("OLLAMA RAW:", json.dumps(result, indent=2))
+        return result.get("response", "[No response field in result]")
     except Exception as e:
-        print("[Dashboard Error]", e)
-
-if __name__ == "__main__":
-    while True:
-        metrics = get_system_metrics()
-        ai_feedback = send_to_ai(metrics)
-        print("\n[AI RECOMMENDATION]\n", ai_feedback)
-        send_to_dashboard(metrics, ai_feedback)
-        time.sleep(60)
+        print("OLLAMA ERROR:", e)
+        return "[AI response unavailable]"
