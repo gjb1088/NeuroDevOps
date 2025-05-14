@@ -14,6 +14,12 @@ services:
     depends_on:
       - ai_engine
     restart: unless-stopped
+      dashboard:
+    build:
+      context: ./dashboard
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
   
     depends_on:
       - ollama_host
