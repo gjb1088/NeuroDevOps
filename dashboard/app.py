@@ -17,3 +17,6 @@ def update():
         'ai': request.form['ai_response']
     }
     return '', 204  # No content, just acknowledge
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
