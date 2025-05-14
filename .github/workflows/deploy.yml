@@ -18,6 +18,3 @@ jobs:
         run: |
           docker compose down
           docker compose up --build -d
-
-      - name: Show container status
-        run: docker ps
