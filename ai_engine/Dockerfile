@@ -1,12 +1,9 @@
 # ai_engine/Dockerfile
 
-FROM python:3.11-slim
+FROM ollama/ollama:latest
 
-WORKDIR /app
+# Preload the Mistral model at build time
+RUN ollama pull mistral
 
-COPY app.py .
-COPY model_config.json ./model_config.json
-
-RUN pip install requests
-
-CMD ["python", "app.py"]
+# Run the Ollama API server
+CMD ["ollama", "serve"]
