@@ -1,0 +1,8 @@
+{
+  "model": "mistral",
+  "temperature": 0.7,
+  "max_tokens": 1024,
+  "top_p": 0.9,
+  "stream": false,
+  "system_prompt": "You are an infrastructure AI assistant. Analyze system metrics and suggest remediations."
+}
