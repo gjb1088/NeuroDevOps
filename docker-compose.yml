@@ -7,22 +7,18 @@ services:
     container_name: neurodevops-ai
     restart: unless-stopped
     expose:
-      - 11434
-   collector:
-     build:
+      - "11434"
+
+  collector:
+    build:
       context: ./collector
     depends_on:
       - ai_engine
     restart: unless-stopped
-      dashboard:
+
+  dashboard:
     build:
       context: ./dashboard
     ports:
       - "8080:8080"
-    restart: unless-stopped
-  
-    depends_on:
-      - ollama_host
-    environment:
-      - OLLAMA_API=http://host.docker.internal:11434/api/generate
     restart: unless-stopped
