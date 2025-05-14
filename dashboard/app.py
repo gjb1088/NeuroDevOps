@@ -1,28 +1,19 @@
-# dashboard/app.py
-
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# In-memory log store
-logs = []
+# Store only the latest data
+latest_log = {}
 
-@app.route('/api/ingest', methods=['POST'])
-def ingest():
-    data = request.json
-    logs.append({
-        'metrics': data.get('metrics', '[missing]'),
-        'ai': data.get('ai', '[missing]')
-    })
-    return jsonify({"status": "ok"})
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
-    if request.method == 'POST':
-        system_metrics = request.form['metrics']
-        ai_response = request.form['ai_response']
-        logs.append({'metrics': system_metrics, 'ai': ai_response})
-    return render_template('index.html', logs=logs)
+    return render_template('index.html', log=latest_log)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+@app.route('/update', methods=['POST'])
+def update():
+    global latest_log
+    latest_log = {
+        'metrics': request.form['metrics'],
+        'ai': request.form['ai_response']
+    }
+    return '', 204  # No content, just acknowledge
