@@ -1,9 +1,20 @@
-from flask import Flask, render_template, request
+# dashboard/app.py
+
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Temporary in-memory storage
+# In-memory log store
 logs = []
+
+@app.route('/api/ingest', methods=['POST'])
+def ingest():
+    data = request.json
+    logs.append({
+        'metrics': data.get('metrics', '[missing]'),
+        'ai': data.get('ai', '[missing]')
+    })
+    return jsonify({"status": "ok"})
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
