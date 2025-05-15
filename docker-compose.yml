@@ -1,34 +1,20 @@
-version: "3.9"
+version: "3.8"
 
 services:
   ai_engine:
-    build:
-      context: ./ai_engine
-    container_name: neurodevops-ai
-    restart: unless-stopped
-    expose:
-      - "11434"
-    networks:
-      - neurodevops_net
-
-  collector:
-    build:
-      context: ./collector
-    depends_on:
-      - ai_engine
-    restart: unless-stopped
-    networks:
-      - neurodevops_net
+    image: neurodevops-ai_engine
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama  # <== Persist models here
 
   dashboard:
-    build:
-      context: ./dashboard
+    image: neurodevops-dashboard
     ports:
       - "8080:8080"
-    restart: unless-stopped
-    networks:
-      - neurodevops_net
 
-networks:
-  neurodevops_net:
-    driver: bridge
+  collector:
+    image: neurodevops-collector
+
+volumes:
+  ollama_models:
