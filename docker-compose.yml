@@ -12,7 +12,6 @@ services:
   collector:
     build:
       context: ./collector
-    container_name: neurodevops-collector
     depends_on:
       - ai_engine
     restart: unless-stopped
@@ -20,7 +19,6 @@ services:
   dashboard:
     build:
       context: ./dashboard
-    container_name: neurodevops-dashboard
     ports:
       - "8080:8080"
     restart: unless-stopped
