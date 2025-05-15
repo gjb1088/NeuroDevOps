@@ -3,41 +3,71 @@
 <head>
   <title>NeuroDevOps Dashboard</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
       font-family: monospace;
       background: #111;
       color: #0f0;
-      padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
 
     h1 {
-      margin-bottom: 2rem;
-      font-size: 1.8rem;
+      font-size: 1.4rem;
+      margin: 0 0 1rem;
       text-align: center;
     }
 
     .entry {
-      max-width: 80ch;
-      width: 100%;
-    }
-
-    pre {
-      background-color: #222;
-      padding: 1rem;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-x: auto;
-      border-left: 4px solid #0f0;
-      margin-bottom: 2rem;
+      width: 90%;
+      max-width: 75ch;
     }
 
     strong {
       display: block;
-      margin: 1rem 0 0.5rem;
-      font-size: 1.1rem;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    pre {
+      background-color: #222;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border-left: 3px solid #0f0;
+      font-size: 0.9rem;
+      line-height: 1.2;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .collapsed {
+      max-height: 25vh;
+    }
+
+    .expanded {
+      max-height: none;
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid #0f0;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 0.25rem 0.75rem;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    button:hover {
+      background: #0f0;
+      color: #111;
     }
 
     p {
@@ -52,11 +82,30 @@
     <div class="entry">
       <strong>🖥️ System Input:</strong>
       <pre>{{ log.metrics }}</pre>
+
       <strong>🤖 Mistral Response:</strong>
-      <pre>{{ log.ai }}</pre>
+      <pre id="mistral-response" class="collapsed">{{ log.ai }}</pre>
+      <button onclick="toggleResponse()">Read More</button>
     </div>
   {% else %}
     <p>Waiting for data...</p>
   {% endif %}
+
+  <script>
+    function toggleResponse() {
+      const pre = document.getElementById('mistral-response');
+      const button = event.target;
+
+      if (pre.classList.contains('collapsed')) {
+        pre.classList.remove('collapsed');
+        pre.classList.add('expanded');
+        button.textContent = 'Show Less';
+      } else {
+        pre.classList.remove('expanded');
+        pre.classList.add('collapsed');
+        button.textContent = 'Read More';
+      }
+    }
+  </script>
 </body>
 </html>
