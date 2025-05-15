@@ -2,19 +2,25 @@ version: "3.8"
 
 services:
   ai_engine:
-    image: neurodevops-ai_engine
+    build:
+      context: ./ai_engine
+    container_name: neurodevops-ai_engine
     ports:
       - "11434:11434"
     volumes:
       - ollama_models:/root/.ollama  # <== Persist models here
 
   dashboard:
-    image: neurodevops-dashboard
+    build:
+      context: ./dashboard
+    container_name: neurodevops-dashboard
     ports:
       - "8080:8080"
 
   collector:
-    image: neurodevops-collector
+    build:
+      context: ./collector
+    container_name: neurodevops-collector
 
 volumes:
   ollama_models:
