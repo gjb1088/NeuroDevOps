@@ -84,8 +84,14 @@
       <pre>{{ log.metrics }}</pre>
 
       <strong>🤖 Mistral Response:</strong>
-      <pre id="mistral-response" class="collapsed">{{ log.ai }}</pre>
-      <button onclick="toggleResponse()">Read More</button>
+      <pre id="mistral-response"
+           class="{% if log.ai != '[AI response unavailable]' and log.ai|length > 300 %}collapsed{% endif %}">
+        {{ log.ai }}
+      </pre>
+
+      {% if log.ai != '[AI response unavailable]' and log.ai|length > 300 %}
+        <button onclick="toggleResponse()">Read More</button>
+      {% endif %}
     </div>
   {% else %}
     <p>Waiting for data...</p>
