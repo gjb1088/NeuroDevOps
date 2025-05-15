@@ -4,7 +4,7 @@ import time
 import json
 import requests
 
-OLLAMA_API = "http://172.18.0.2:11434/api/generate"
+OLLAMA_API = "http://192.168.1.156:11434/api/generate"
 DASHBOARD_API = "http://dashboard:8080/update"
 
 def get_system_metrics():
