@@ -4,7 +4,7 @@ import time
 import json
 import requests
 
-OLLAMA_API = "http://ai_engine:11434/api/generate"
+OLLAMA_API = "http://neurodevops-ai:11434/api/generate"
 DASHBOARD_API = "http://dashboard:8080/update"
 
 def get_system_metrics():
