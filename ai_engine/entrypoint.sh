@@ -9,8 +9,8 @@ until curl -s http://localhost:11434 > /dev/null; do
   sleep 2
 done
 
-# Pull the model once Ollama is ready
+# Pull the model
 ollama pull mistral
 
-# Keep Ollama running in the foreground
-fg %1
+# Now run Ollama in the foreground properly
+exec ollama serve
