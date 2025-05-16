@@ -2,19 +2,20 @@
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:4000');
+const WS_URL = `${window.location.protocol}//${window.location.hostname}:4000`;
+const socket = io(WS_URL);
 
 export default function TelemetryCard() {
-  const [m, setM] = useState<{ cpu_percent: number; mem_percent: number } | null>(null);
+  const [m, setM] = useState<any>(null);
 
   useEffect(() => {
-    socket.on('telemetry', data => setM(data));
-    return () => { socket.off('telemetry'); };
+    socket.on('telemetry', setM);
+    return () => { socket.off('telemetry', setM); };
   }, []);
 
   if (!m) return <div>Waiting for telemetry…</div>;
   return (
-    <div className="border-green-400 border p-2 rounded">
+    <div>
       <p>CPU: {m.cpu_percent}%</p>
       <p>RAM: {m.mem_percent}%</p>
     </div>
