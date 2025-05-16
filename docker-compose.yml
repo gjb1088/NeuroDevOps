@@ -1,26 +1,35 @@
-version: "3.8"
-
+version: '3.8'
 services:
-  ai_engine:
-    build:
-      context: ./ai_engine
+  redis:
+    image: redis:7-alpine
+    container_name: neurodevops-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  neurodevops-collector:
+    build: ./collector
+    container_name: neurodevops-collector
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: unless-stopped
+
+  neurodevops-ai_engine:
+    build: ./ai_engine
     container_name: neurodevops-ai_engine
     ports:
-      - "11434:11434"
-    volumes:
-      - ollama_models:/root/.ollama  # <== Persist models here
+      - '11434:11434'
+    restart: unless-stopped
 
-  dashboard:
-    build:
-      context: ./dashboard
+  neurodevops-dashboard:
+    build: ./dashboard
     container_name: neurodevops-dashboard
+    depends_on:
+      - collector
+      - ai_engine
     ports:
-      - "8080:8080"
-
-  collector:
-    build:
-      context: ./collector
-    container_name: neurodevops-collector
-
-volumes:
-  ollama_models:
+      - '3000:3000'
+    restart: unless-stopped
