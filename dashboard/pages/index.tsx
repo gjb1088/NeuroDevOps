@@ -8,9 +8,12 @@ import AIResponseCard from '../components/AIResponseCard';
 export default function Home() {
   const [metrics, setMetrics] = useState(null);
   useEffect(() => {
-    const socket = io(`${window.location.protocol}//${window.location.hostname}:4000`);
+    const socket: Socket = io(`${window.location.protocol}//${window.location.hostname}:4000`);
     socket.on('telemetry', setMetrics);
-    return () => socket.disconnect();
+     return () => {
+     socket.off('telemetry', setMetrics);
+     socket.disconnect();             // now returns void
+   };
   }, []);
 
   return (
