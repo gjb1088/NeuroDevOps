@@ -1,68 +1,58 @@
 // dashboard/components/AIResponseCard.tsx
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react';
 
 interface Telemetry {
-  timestamp: number
-  cpu_percent: number
-  mem_percent: number
-  disk_percent: number
-  net_io?: any
+  timestamp: number;
+  cpu_percent: number;
+  mem_percent: number;
+  disk_percent: number;
+  net_io?: any;
 }
 
-export default function AIResponseCard({
-  metrics
-}: {
-  metrics: Telemetry
-}) {
-  const [response, setResponse] = useState<string>('')
-  const [loading, setLoading] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+interface AIResponseCardProps {
+  metrics: Telemetry;
+}
+
+// Debounce interval (ms) – only call once per 30 seconds
+const DEBOUNCE_MS = 60_000;
+
+export default function AIResponseCard({ metrics }: AIResponseCardProps) {
+  const lastRun = useRef(0);
+  const [response, setResponse] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Helper to build the prompt from metrics
+  const buildPrompt = (m: Telemetry) => `
+[CPU usage: ${m.cpu_percent.toFixed(1)}%]
+[Memory usage: ${m.mem_percent.toFixed(1)}%]
+[Disk usage: ${m.disk_percent.toFixed(1)}%]
+Explain the system status in plain English.
+`;
 
   useEffect(() => {
-    async function run() {
-      setLoading(true)
-      // Build the same prompt you had before:
-      const prompt = `
-[CPU usage: ${metrics.cpu_percent}%]
-[Memory usage: ${metrics.mem_percent}%]
-[Disk usage: ${metrics.disk_percent}%]
-Explain the system status in plain English.
-`
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      })
-      const { text } = await res.json()
-      setResponse(text || 'No response')
-      setLoading(false)
-    }
-    run()
-  }, [metrics])
+    const now = Date.now();
+    // skip if we ran recently
+    if (now - lastRun.current < DEBOUNCE_MS) return;
+    lastRun.current = now;
 
-  if (loading) {
-    return <div className="italic">Generating AI response…</div>
-  }
-  if (!response) {
-    return null
-  }
-
-  const preview = response.slice(0, 250).trim()
-  const isLong = response.length > 250
+    setLoading(true);
+    fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'mistral', prompt: buildPrompt(metrics) })
+    })
+      .then((res) => res.json())
+      .then((json) => setResponse(json.text || 'No response'))
+      .catch((err) => setResponse(`Error: ${err.message}`))
+      .finally(() => setLoading(false));
+  }, [metrics]);
 
   return (
     <div className="border-green-400 border p-4 rounded bg-gray-900">
-      <pre className="whitespace-pre-wrap font-mono">
-        {expanded || !isLong ? response : preview + '…'}
-      </pre>
-      {isLong && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-sm underline"
-        >
-          {expanded ? 'Show Less' : 'Show More'}
-        </button>
+      {loading && <div className="italic">Generating AI response…</div>}
+      {!loading && response && (
+        <pre className="whitespace-pre-wrap font-mono">{response}</pre>
       )}
     </div>
-  )
+  );
 }
