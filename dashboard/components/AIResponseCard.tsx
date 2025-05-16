@@ -50,9 +50,18 @@ Explain the system status in plain English, in **no more than three sentences**.
   return (
     <div className="border-green-400 border p-4 rounded bg-gray-900">
       {loading && <div className="italic">Generating AI response…</div>}
-      {!loading && response && (
-        <pre className="whitespace-pre-wrap font-mono">{response}</pre>
-      )}
+     {!loading && response && (
+    <div
+      className="
+        font-mono
+        whitespace-pre-wrap   /* respect newlines */
+        break-words           /* wrap long words */
+        max-h-60              /* max-height: 15rem (adjust as needed) */
+        overflow-y-auto       /* scroll if content exceeds height */
+        px-2 py-1             /* padding for readability */
+      "
+    >
+      {response}
     </div>
-  );
+  )};
 }
