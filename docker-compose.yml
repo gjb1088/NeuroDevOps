@@ -1,11 +1,10 @@
-version: '3.8'
 services:
   redis:
     image: redis:7-alpine
     container_name: neurodevops-redis
     restart: unless-stopped
     ports:
-      - '6379:6379'
+      - "6379:6379"
 
   neurodevops-collector:
     build: ./collector
@@ -21,15 +20,15 @@ services:
     build: ./ai_engine
     container_name: neurodevops-ai_engine
     ports:
-      - '11434:11434'
+      - "11434:11434"
     restart: unless-stopped
 
   neurodevops-dashboard:
     build: ./dashboard
     container_name: neurodevops-dashboard
     depends_on:
-      - collector
-      - ai_engine
+      - neurodevops-collector
+      - neurodevops-ai_engine
     ports:
-      - '3000:3000'
+      - "3000:3000"
     restart: unless-stopped
