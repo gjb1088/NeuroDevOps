@@ -1,7 +1,10 @@
 {
-  "name": "neurodevops-ws-proxy",
+  "name": "neurodevops-ws_proxy",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js"
+  },
   "dependencies": {
     "ioredis": "^5.3.2",
     "socket.io": "^4.7.2"
