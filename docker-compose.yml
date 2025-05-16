@@ -21,7 +21,10 @@ services:
     container_name: neurodevops-ai_engine
     ports:
       - "11434:11434"
-    restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - ai_engine
 
   neurodevops-dashboard:
     build: ./dashboard
