@@ -32,3 +32,17 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
+
+  ws_proxy:
+    build: ./ws_proxy
+    container_name: neurodevops-ws_proxy
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - WS_PORT=4000
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
