@@ -1,13 +1,21 @@
+:root {
+  --brand-primary: #FF00FF;
+  --brand-accent:  #39FF14;
+  --brand-font:    "VT323", monospace;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Neon flicker keyframes */
-@keyframes neon-flicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
-  20%, 24%, 55%                   { opacity: 0.85; }
-}
+/* Utility classes for your brand */
+.text-brand   { color: var(--brand-primary); }
+.text-accent  { color: var(--brand-accent); }
+.bg-brand     { background-color: var(--brand-primary); }
 
-.flicker {
-  animation: neon-flicker 3s infinite ease-in-out;
+/* flicker keyframes */
+@keyframes neon-flicker {
+  0%,18%,22%,25%,53%,57%,100% { opacity:1 }
+  20%,24%,55%                  { opacity:0.85 }
 }
+.flicker { animation: neon-flicker 3s infinite ease-in-out }
