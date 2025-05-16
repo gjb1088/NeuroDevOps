@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json ./
 
 # 2) Install dependencies (including socket.io-client)
-RUN npm ci --production
+RUN npm install --production
 
 # 3) Copy the rest of your source
 COPY . .
