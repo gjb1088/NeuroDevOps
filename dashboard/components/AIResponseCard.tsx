@@ -42,7 +42,7 @@ Explain the system status in plain English.
       body: JSON.stringify({ model: 'mistral', prompt: buildPrompt(metrics) })
     })
       .then((res) => res.json())
-      .then((json) => setResponse(json.text || 'No response'))
+      .then((json) => setResponse(json.text || ''))
       .catch((err) => setResponse(`Error: ${err.message}`))
       .finally(() => setLoading(false));
   }, [metrics]);
