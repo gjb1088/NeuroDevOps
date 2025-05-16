@@ -22,11 +22,11 @@ export default function AIResponseCard({ metrics }: AIResponseCardProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Helper to build the prompt from metrics
-  const buildPrompt = (m: Telemetry) => `
+ const buildPrompt = (m: Telemetry) => `
 [CPU usage: ${m.cpu_percent.toFixed(1)}%]
 [Memory usage: ${m.mem_percent.toFixed(1)}%]
 [Disk usage: ${m.disk_percent.toFixed(1)}%]
-Explain the system status in plain English.
+Explain the system status in plain English, in **no more than three sentences**.
 `;
 
   useEffect(() => {
