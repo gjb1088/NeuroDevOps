@@ -1,12 +1,9 @@
 FROM python:3.11-slim
 
 WORKDIR /app
+COPY src/collector.py .
 
-# Install curl for debugging
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir psutil redis
 
-COPY app.py .
-
-RUN pip install requests
-
-CMD ["python", "app.py"]
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "collector.py"]
