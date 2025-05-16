@@ -29,7 +29,6 @@ services:
     depends_on:
       - neurodevops-collector
       - neurodevops-ai_engine
-      - ws_proxy
     ports:
       - "3000:3000"
     restart: unless-stopped
