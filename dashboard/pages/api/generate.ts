@@ -18,7 +18,7 @@ export default async function handler(
     const upstream = await fetch('http://ai_engine:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'mistral', prompt })
+      body: JSON.stringify({ model: 'mistral', prompt, stream: false })
     });
 
     const raw = await upstream.text();  
