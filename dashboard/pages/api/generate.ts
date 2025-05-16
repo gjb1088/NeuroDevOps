@@ -12,36 +12,39 @@ export default async function handler(
   }
 
   const { prompt } = req.body;
-
-  // Log the incoming prompt
   console.log('🧠 prompt:', prompt);
 
   try {
-    const upstream = await fetch(
-      'http://ai_engine:11434/api/generate',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'mistral',
-          prompt
-        })
-      }
-    );
+    const upstream = await fetch('http://ai_engine:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'mistral', prompt })
+    });
 
-    // Parse and log the raw JSON from Ollama
-    const json = await upstream.json();
-    console.log('🧠 ai_engine replied:', json);
+    const raw = await upstream.text();  
+    console.log('🧠 ai_engine raw response:', raw);
 
+    let json: any;
+    try {
+      json = JSON.parse(raw);
+    } catch (parseErr) {
+      console.error('❌ JSON parse error:', parseErr);
+      console.error('❌ Raw body was:', raw);
+      // return the raw body as the error so you can inspect it client-side if you like
+      return res.status(500).json({ error: `Upstream parse error: ${parseErr.message}` });
+    }
+
+    // now extract text
     const text =
       json.completions?.[0]?.data?.text ||
       json.choices?.[0]?.text ||
       json.text ||
       '';
 
+    console.log('🧠 parsed text:', text);
     return res.status(200).json({ text });
   } catch (e: any) {
-    console.error('🧠 generate error:', e);
+    console.error('🔥 generate exception:', e);
     return res.status(500).json({ error: e.message });
   }
 }
