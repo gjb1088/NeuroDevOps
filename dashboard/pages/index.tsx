@@ -1,6 +1,6 @@
 // dashboard/pages/index.tsx
 import { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import BrandHeader from '../components/BrandHeader';
 import TelemetryCard from '../components/TelemetryCard';
 import AIResponseCard from '../components/AIResponseCard';
