@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import BrandHeader from '../components/BrandHeader';
-import TelemetryCard from '../components/TelemetryCard';
+import NetworkCard from '../components/NetworkCard';
 import AIResponseCard from '../components/AIResponseCard';
 
 export default function Home() {
