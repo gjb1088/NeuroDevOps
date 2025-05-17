@@ -1,5 +1,5 @@
 // dashboard/pages/_app.tsx
-import '../styles/globals.css';
+import '../styles/global.css';
 import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import branding from '../config/branding';
