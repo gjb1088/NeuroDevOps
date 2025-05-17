@@ -1,68 +1,45 @@
 // dashboard/components/AIResponseCard.tsx
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react'
+import type { NetTelemetry } from './NetworkCard'  // <-- pull in your new interface
 
-interface Telemetry {
-  timestamp: number;
-  cpu_percent: number;
-  mem_percent: number;
-  disk_percent: number;
-  net_io?: any;
-}
-
-interface Props {
-  metrics: Telemetry;
-}
-
-const DEBOUNCE_MS = 60_000;
+type Props = { metrics: NetTelemetry }
 
 export default function AIResponseCard({ metrics }: Props) {
-  const lastRun = useRef(0);
-  const [response, setResponse] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const buildPrompt = (m: Telemetry) => `
-[CPU usage: ${m.cpu_percent.toFixed(1)}%]
-[Memory usage: ${m.mem_percent.toFixed(1)}%]
-[Disk usage: ${m.disk_percent.toFixed(1)}%]
-Explain the system status in plain English, in no more than three sentences.
-`;
+  const [response, setResponse] = useState<string | null>(null)
+  const [loading, setLoading]   = useState(false)
 
   useEffect(() => {
-    const now = Date.now();
-    if (now - lastRun.current < DEBOUNCE_MS) return;
-    lastRun.current = now;
+    async function fetchAnalysis() {
+      setLoading(true)
+      // Build the network‐only prompt
+      let prompt = 
+        `[Latency: ${metrics.latency_ms} ms] ` +
+        `[Packet Loss: ${metrics.packet_loss_pct}%] ` +
+        `[Throughput: ${metrics.throughput_mbps} Mbps]`
+      if (metrics.jitter_ms != null) {
+        prompt += ` [Jitter: ${metrics.jitter_ms} ms]`
+      }
+      prompt += ' Explain the network health and any potential issues in two sentences.'
 
-    setLoading(true);
-    fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'mistral', prompt: buildPrompt(metrics), stream: false })
-    })
-      .then((res) => res.json())
-      .then((json) => setResponse(json.text || ''))
-      .catch((err) => setResponse(`Error: ${err.message}`))
-      .finally(() => setLoading(false));
-  }, [metrics]);
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(metrics)  // <― POST the raw metrics object to your updated handler
+      })
+      const json = await res.json()
+      setResponse(json.text ?? json.error ?? 'No response')
+      setLoading(false)
+    }
+
+    fetchAnalysis()
+  }, [metrics])
 
   return (
-    <div className="border-green-400 border p-4 rounded bg-gray-900">
-      {loading && (
-        <div className="italic">Generating AI response…</div>
-      )}
+    <div className="relative bg-burn-bg p-4 rounded-lg border border-accent shadow-neon overflow-auto">
+      {loading && <p className="italic">Analyzing network data…</p>}
       {!loading && response && (
-        <div
-          className="
-            font-mono
-            whitespace-pre-wrap
-            break-words
-            max-h-60
-            overflow-y-auto
-            px-2 py-1
-          "
-        >
-          {response}
-        </div>
+        <p className="whitespace-pre-wrap text-accent">{response}</p>
       )}
     </div>
-  );
+  )
 }
