@@ -7,12 +7,12 @@ interface NetIO {
   [key: string]: any;
 }
 
-interface Telemetry {
-  timestamp: number;
-  cpu_percent: number;
-  mem_percent: number;
-  disk_percent: number;
-  net_io?: NetIO;
+interface NetTelemetry {
+  timestamp:   number;
+  latency_ms:  number;   // ping round-trip in ms
+  packet_loss_pct: number;
+  throughput_mbps:  number;
+  jitter_ms?:       number;  // optional
 }
 
 type Props = { metrics: Telemetry };
