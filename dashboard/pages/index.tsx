@@ -22,7 +22,15 @@ export default function Home() {
       `${window.location.protocol}//${window.location.hostname}:4000`
     );
 
-    socket.on('telemetry', setMetrics);
+    socket.on("telemetry", (data) => {
+    console.log("🛰️ got telemetry event:", data);
+    setMetrics(data);
+  });
+
+  socket.on("connect_error", (err) => {
+    console.error("❌ socket connection error:", err);
+  });
+
 
     return () => {
       socket.off('telemetry', setMetrics);
