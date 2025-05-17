@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import type { NetTelemetry } from './NetworkCard'  // <-- pull in your new interface
 
+const DEBOUNCE_MS = 60_000; // 1 minute
+
 type Props = { metrics: NetTelemetry }
 
 export default function AIResponseCard({ metrics }: Props) {
