@@ -1,57 +1,58 @@
 services:
-   neurodevops-collector:
-    build: ./collector
-    environment:
-      - REDIS_HOST=neurodevops-redis
-      - REDIS_PORT=6379
-      - PUBLISH_INTERVAL=5
-    depends_on:
-      - neurodevops-redis
-    # ...
   neurodevops-redis:
     image: redis:alpine
-    # ...
+    container_name: neurodevops-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
 
   neurodevops-collector:
-    build: ./collector
+    build:
+      context: ./collector
     container_name: neurodevops-collector
     depends_on:
-      - redis
+      - neurodevops-redis
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      REDIS_HOST: neurodevops-redis
+      REDIS_PORT: 6379
+      PUBLISH_INTERVAL: 5
     restart: unless-stopped
 
   neurodevops-ai_engine:
-    build: ./ai_engine
+    build:
+      context: ./ai_engine
     container_name: neurodevops-ai_engine
+    depends_on:
+      - neurodevops-collector
     ports:
       - "11434:11434"
     networks:
       default:
         aliases:
           - ai_engine
-
-  neurodevops-dashboard:
-    build: ./dashboard
-    container_name: neurodevops-dashboard
-    depends_on:
-      - neurodevops-collector
-      - neurodevops-ai_engine
-    ports:
-      - "3000:3000"
     restart: unless-stopped
 
   ws_proxy:
-    build: ./ws_proxy
+    build:
+      context: ./ws_proxy
     container_name: neurodevops-ws_proxy
     depends_on:
-      - redis
+      - neurodevops-redis
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - WS_PORT=4000
+      REDIS_HOST: neurodevops-redis
+      REDIS_PORT: 6379
+      WS_PORT: 4000
     ports:
       - "4000:4000"
     restart: unless-stopped
 
+  neurodevops-dashboard:
+    build:
+      context: ./dashboard
+    container_name: neurodevops-dashboard
+    depends_on:
+      - ws_proxy
+      - neurodevops-ai_engine
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
