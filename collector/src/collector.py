@@ -1,56 +1,38 @@
-# collector.py
-
+# collector/src/collector.py
 import os
 import time
-import json
-
-import ping3
 import psutil
 import redis
+import json
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-CHANNEL    = "telemetry:latest"
-TARGET_IP  = os.getenv("PING_TARGET", "8.8.8.8")
-PUBLISH_INTERVAL = int(os.getenv("PUBLISH_INTERVAL", 5))
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+CHANNEL     = 'telemetry:latest'
+# now read the publish interval from env
+PUBLISH_INTERVAL = int(os.getenv('PUBLISH_INTERVAL', 5))
 
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+print(f"[collector] → starting, will publish every {PUBLISH_INTERVAL}s to {REDIS_HOST}:{REDIS_PORT} channel={CHANNEL}")
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, socket_connect_timeout=5)
 
-def gather_network_metrics():
-    # 1) measure latency (ms)
-    latency = ping3.ping(TARGET_IP, unit="ms")
-    latency_ms = round(latency or 0.0, 1)
-
-    # 2) quick packet-loss estimate: 5 probes
-    probes = 5
-    failures = 0
-    for _ in range(probes):
-        if ping3.ping(TARGET_IP, unit="ms") is None:
-            failures += 1
-    packet_loss_pct = round((failures / probes) * 100, 1)
-
-    # 3) throughput: measure bytes over one second
-    counters_before = psutil.net_io_counters()
-    time.sleep(1)
-    counters_after  = psutil.net_io_counters()
-    delta_bytes     = (
-        (counters_after.bytes_sent + counters_after.bytes_recv)
-        - (counters_before.bytes_sent + counters_before.bytes_recv)
-    )
-    throughput_mbps = round((delta_bytes * 8) / (1024 * 1024), 1)
-
+def gather_metrics():
     return {
-        "timestamp":          int(time.time() * 1000),
-        "latency_ms":         latency_ms,
-        "packet_loss_pct":    packet_loss_pct,
-        "throughput_mbps":    throughput_mbps,
+        'timestamp': time.time(),
+        'cpu_percent': psutil.cpu_percent(interval=1),
+        'mem_percent': psutil.virtual_memory().percent,
+        'disk_percent': psutil.disk_usage('/').percent,
+        'net_io': psutil.net_io_counters()._asdict(),
     }
 
 def main():
     while True:
-        metrics = gather_network_metrics()
-        r.publish(CHANNEL, json.dumps(metrics))
+        m = gather_metrics()
+        payload = json.dumps(m)
+        try:
+            r.publish(CHANNEL, payload)
+            print(f"[collector] → published: {payload}")
+        except Exception as e:
+            print(f"[collector][ERROR] could not publish to Redis:", e)
         time.sleep(PUBLISH_INTERVAL)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
