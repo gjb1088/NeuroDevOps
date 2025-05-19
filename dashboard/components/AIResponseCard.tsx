@@ -1,47 +1,55 @@
 // dashboard/components/AIResponseCard.tsx
-import { useEffect, useState } from 'react'
-import type { NetTelemetry } from './NetworkCard'  // <-- pull in your new interface
+import { useEffect, useRef, useState } from "react";
+import { NetTelemetry } from "../pages/index";
 
-const DEBOUNCE_MS = 60_000; // 1 minute
+const DEBOUNCE_MS = 60_000;
 
-type Props = { metrics: NetTelemetry }
+type Props = { metrics: NetTelemetry };
 
 export default function AIResponseCard({ metrics }: Props) {
-  const [response, setResponse] = useState<string | null>(null)
-  const [loading, setLoading]   = useState(false)
+  const [response, setResponse] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const lastCall = useRef(0);
 
   useEffect(() => {
-    async function fetchAnalysis() {
-      setLoading(true)
-      // Build the network‐only prompt
-      let prompt = 
-        `[Latency: ${metrics.latency_ms} ms] ` +
-        `[Packet Loss: ${metrics.packet_loss_pct}%] ` +
-        `[Throughput: ${metrics.throughput_mbps} Mbps]`
-      if (metrics.jitter_ms != null) {
-        prompt += ` [Jitter: ${metrics.jitter_ms} ms]`
-      }
-      prompt += ' Explain the network health and any potential issues in two sentences.'
-
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(metrics)  // <― POST the raw metrics object to your updated handler
-      })
-      const json = await res.json()
-      setResponse(json.text ?? json.error ?? 'No response')
-      setLoading(false)
+    const now = Date.now();
+    if (now - lastCall.current < DEBOUNCE_MS) {
+      // skip: still in debounce window
+      return;
     }
+    lastCall.current = now;
+    setLoading(true);
 
-    fetchAnalysis()
-  }, [metrics])
+    // build a short prompt with only the three network metrics
+    const prompt = `
+Latency: ${metrics.latency_ms} ms
+Packet Loss: ${metrics.packet_loss_pct} %
+Throughput: ${metrics.throughput_mbps} Mbps
+Explain the current network health and any issues in two sentences.
+`;
+
+    fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    })
+      .then((r) => r.json())
+      .then((j) => {
+        setResponse(j.text || j.error || "No response");
+      })
+      .catch((e) => {
+        setResponse(`❌ ${e.message}`);
+      })
+      .finally(() => setLoading(false));
+  }, [metrics]);
 
   return (
-    <div className="relative bg-burn-bg p-4 rounded-lg border border-accent shadow-neon overflow-auto">
-      {loading && <p className="italic">Analyzing network data…</p>}
-      {!loading && response && (
-        <p className="whitespace-pre-wrap text-accent">{response}</p>
+    <div className="border-green-400 border rounded p-4 bg-gray-900 text-green-300">
+      {loading ? (
+        <p className="italic">Analyzing network data…</p>
+      ) : (
+        <p>{response}</p>
       )}
     </div>
-  )
+  );
 }
