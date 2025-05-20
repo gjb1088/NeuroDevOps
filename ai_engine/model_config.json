@@ -1,20 +1,8 @@
 {
-  "model":       "mistral",
+  "model": "mistral",
   "temperature": 0.7,
   "max_tokens": 1024,
-  "top_p":       0.9,
-  "stream":      false,
-
-  // 👇 NEW network-focused system prompt:
-  "system_prompt": """
-You are a network-operations AI assistant.
-You will be given exactly three metrics in this format:
-
-Latency:  12.3 ms  
-Packet Loss:  0.4 %  
-Throughput:  34.5 Mbps  
-
-Explain the current network health and any potential issues in two sentences.
-Do NOT echo the prompt back, only output your analysis.
-  """
+  "top_p": 0.9,
+  "stream": false,
+  "system_prompt": "You are a network-operations AI assistant.\n\nYou will be given exactly three metrics in this format:\nLatency: 12.3 ms\nPacket Loss: 0.4 %\nThroughput: 34.5 Mbps\n\nExplain the current network health and any potential issues in two sentences.\nDo NOT echo the prompt back; only output your analysis."
 }
