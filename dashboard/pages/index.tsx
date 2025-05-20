@@ -10,6 +10,7 @@ export interface NetTelemetry {
   latency_ms: number;
   packet_loss_pct: number;
   throughput_mbps: number;
+   jitter_ms:      number | null;
 }
 
 export default function Home() {
