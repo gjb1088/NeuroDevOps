@@ -28,6 +28,8 @@ Throughput: ${metrics.throughput_mbps} Mbps
 Explain the current network health and any issues in two sentences.
 `;
 
+    console.log("📡 AI prompt:", prompt)
+
     fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
