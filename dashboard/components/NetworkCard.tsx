@@ -1,16 +1,14 @@
-// dashboard/components/NetworkCard.tsx
 import { NetTelemetry } from "../pages/index";
 
-type Props = { metrics: NetTelemetry };
-
-export default function NetworkCard({ metrics }: Props) {
-  const { latency_ms, packet_loss_pct, throughput_mbps } = metrics;
-
+export default function NetworkCard({ metrics }: { metrics: NetTelemetry }) {
   return (
-    <div className="border-green-400 border rounded p-4 bg-gray-900 text-green-300">
-      <p>Latency: {latency_ms} ms</p>
-      <p>Packet Loss: {packet_loss_pct} %</p>
-      <p>Throughput: {throughput_mbps} Mbps</p>
+    <div className="border-accent border rounded p-4">
+      <div>Latency:       <strong>{metrics.latency_ms} ms</strong></div>
+      <div>Packet Loss:   <strong>{metrics.packet_loss_pct}%</strong></div>
+      <div>Throughput:    <strong>{metrics.throughput_mbps} Mbps</strong></div>
+      {metrics.jitter_ms != null && (
+        <div>Jitter:        <strong>{metrics.jitter_ms} ms</strong></div>
+      )}
     </div>
   );
 }
