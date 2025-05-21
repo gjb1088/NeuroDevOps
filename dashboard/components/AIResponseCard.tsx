@@ -37,12 +37,14 @@ export default function AIResponseCard({ metrics }: Props) {
     ].join("\n");
 
     console.log("📡 AI prompt:", prompt);
+const payload = JSON.stringify({ prompt });
+console.log("📡 → /api/generate payload:", payload);
 
-    fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    })
+fetch("/api/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: payload,
+})
       .then((r) => r.json())
       .then((j) => setResponse(j.text || j.error || "No response"))
       .catch((e) => setResponse(`❌ ${e.message}`))
