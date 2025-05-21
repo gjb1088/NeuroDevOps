@@ -38,7 +38,7 @@ export default async function handler(
   );
   const prompt = promptLines.join(' ');
 
-  console.log('🧠 prompt:', prompt);
+  console.log("🧠 /api/generate — forwarding prompt:", prompt);
 
   try {
     const upstream = await fetch(
