@@ -8,6 +8,9 @@ RUN bash -c "ollama serve & \
     until curl -s http://localhost:11434 > /dev/null; do sleep 1; done && \
     ollama pull mistral"
 
+# Copy in your custom prompt
+COPY model_config.json /root/.ollama/config.json
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
