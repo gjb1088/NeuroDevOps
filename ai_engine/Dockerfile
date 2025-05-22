@@ -9,7 +9,7 @@ RUN bash -c "ollama serve & \
     ollama pull mistral"
 
 # Copy in your custom prompt
-COPY model_config.json /root/.ollama/config.json
+COPY config.json /root/.ollama/config.json
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
